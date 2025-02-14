@@ -5,8 +5,6 @@ import Home from "./components/Home";
 import PrivateComponent from "./PrivateComponent";
 import LoginPage from "./components/LoginPage";
 import Chat from "./components/Chat";
-
-import Test from "./components/Test";
 function App() {
   return (
     <BrowserRouter>
@@ -17,7 +15,6 @@ function App() {
           <Route path="/reasons" element={<Chat fName={"Reasons"} />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="test" element={<Test />} />
       </Routes>
     </BrowserRouter>
   );

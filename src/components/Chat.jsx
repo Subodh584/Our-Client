@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getFileLines, addLineToFile, deleteLineFromFile } from "../api";
 import { useNavigate } from "react-router-dom";
 
 export default function Chat({ fName }) {
-  const [fileName, setFileName] = useState(fName); // Use fName directly
+  const [fileName, setFileName] = useState(fName);
   const [user, setUser] = useState(() => localStorage.getItem("UserName"));
   const [lines, setLines] = useState([]);
   const [newLine, setNewLine] = useState("");
   const chatEndRef = useRef(null);
+  const navigate = useNavigate();
+
+  const fetchLines = useCallback(async () => {
+    if (!fileName) return;
+    const data = await getFileLines(fileName);
+    setLines(data);
+  }, [fileName]); // Only recreate if fileName changes
 
   useEffect(() => {
-    setFileName(fName); // Update fileName when fName changes
+    setFileName(fName);
   }, [fName]);
 
   useEffect(() => {
@@ -18,21 +25,14 @@ export default function Chat({ fName }) {
       fetchLines();
     }
     setUser(localStorage.getItem("UserName"));
-  }, [fileName]); // Fetch lines when fileName updates
+  }, [fileName, fetchLines]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [lines]);
 
-  const fetchLines = async () => {
-    if (!fileName) return;
-    const data = await getFileLines(fileName);
-    setLines(data);
-  };
-
   const handleAddLine = async () => {
     if (newLine.trim() === "") return;
-
     await addLineToFile(
       fileName,
       user === "Subodh" ? "#" + newLine : "@" + newLine
@@ -46,11 +46,8 @@ export default function Chat({ fName }) {
     fetchLines();
   };
 
-  const navigate = useNavigate();
-
   const handleBack = () => {
-    // Add your logout logic here
-    navigate('/'); // or wherever you want to redirect after logout
+    navigate('/');
   };
 
   return fName === "Complaints" ? (
